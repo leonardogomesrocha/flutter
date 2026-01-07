@@ -15,7 +15,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final passwordConfirmationController = TextEditingController();
-  bool register = true;
+  bool register = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                     label: 'Password',
                     textEditingController: passwordController,
                   ),
-                  if (register == true)
+                  if (register)
                     AuthenticationTextFormField(
                       icon: Icons.password,
                       label: 'Password Confirmation',
@@ -61,7 +61,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                           );
                         } else {
                           // REGISTER (se quiser tratar depois)
-                          print('Registrar usuário');
+                          print('Create an user');
                         }
                       }
                     },

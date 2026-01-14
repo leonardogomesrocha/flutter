@@ -245,8 +245,8 @@ class _MainPageState extends State<MainPage> {
               );
               // If user confirmed, logout
               if (shouldLogout ?? false) {
-                // Clear auth/session if needed
-                // AuthSession().clear();
+
+                AuthSession().clear();
 
                 // Navigate to login page and remove all previous routes
                 Navigator.pushAndRemoveUntil(

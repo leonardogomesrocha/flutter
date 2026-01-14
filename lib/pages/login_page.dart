@@ -3,6 +3,7 @@ import 'package:flutter_app/pages/authentication_text_form_field.dart';
 import 'package:flutter_app/pages/wave.dart';
 import 'package:flutter_app/pages/main_page.dart';
 import '../services/auth_service.dart';
+import '../services/auth_session.dart';
 
 
 class AuthenticationScreen extends StatefulWidget {
@@ -57,6 +58,12 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
     try {
       final data = await _authService.login(email, password);
+
+      AuthSession().setSession(
+        accessToken: data['access_token'],
+        tokenType: data['token_type'],
+        expiresIn: data['expires_in'],
+      );
 
       // Access token is in data['access_token'] if you need it
       // Navigate to MainPage after successful login

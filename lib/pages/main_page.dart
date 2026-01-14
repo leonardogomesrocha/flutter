@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_app/services/metric_service.dart';
+import 'package:flutter_app/services/auth_session.dart';
+import 'package:flutter_app/pages/login_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -222,7 +224,38 @@ class _MainPageState extends State<MainPage> {
           child: ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Log out'),
-            onTap: () => Navigator.pop(context),
+            onTap: () async {
+              // Show confirmation dialog
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Confirm Logout'),
+                  content: const Text('Are you sure you want to log out?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false), // cancel
+                      child: const Text('No'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true), // confirm
+                      child: const Text('Yes'),
+                    ),
+                  ],
+                ),
+              );
+              // If user confirmed, logout
+              if (shouldLogout ?? false) {
+                // Clear auth/session if needed
+                // AuthSession().clear();
+
+                // Navigate to login page and remove all previous routes
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthenticationScreen()),
+                      (route) => false,
+                );
+              }
+            },
           ),
         ),
       ),

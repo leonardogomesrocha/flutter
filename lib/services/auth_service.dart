@@ -40,7 +40,7 @@ class AuthService {
 
   /// Registers a new user
   /// Returns the API response as Map
-  /// Throws an exception if registration fails
+  /// ThFuture<String>ation fails
   Future<Map<String, dynamic>> register({
     required String email,
     required String password,
@@ -66,7 +66,9 @@ class AuthService {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       // Success (201 Created or 200 OK)
-      return jsonDecode(response.body);
+      return {
+        'email': email,
+      };
     } else if (response.statusCode == 400) {
       // Bad request (validation error)
       throw Exception('Registration failed: ${response.body}');

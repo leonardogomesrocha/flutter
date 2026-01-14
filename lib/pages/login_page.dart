@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/pages/authentication_text_form_field.dart';
 import 'package:flutter_app/pages/wave.dart';
 import 'package:flutter_app/pages/main_page.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../services/auth_service.dart';
+
 
 class AuthenticationScreen extends StatefulWidget {
   const AuthenticationScreen({super.key});
@@ -17,41 +17,55 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final passwordConfirmationController = TextEditingController();
+  final AuthService _authService = AuthService();
   bool register = false;
   bool isLoading = false;
 
-  // --- Login Service Call ---
+  Future<void> _register(String email, String password, String confirmedPassword) async {
+    setState(() => isLoading = true);
+
+    try {
+      final data = await _authService.register(
+        email: email,
+        password: password,
+        confirmedPassword: confirmedPassword,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Registration successful! Please log in.',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      // Switch to login mode
+      setState(() => register = false);
+      _formKey.currentState?.reset();
+    } catch (e) {
+      _showError(e.toString());
+    } finally {
+      setState(() => isLoading = false);
+    }
+  }
+
   Future<void> _login(String email, String password) async {
     setState(() => isLoading = true);
 
-    const String basicAuth = 'Basic YXBpdXNlcjoxMjM0NTY=';
-    final url = Uri.parse('https://sport-api-914604082584.us-central1.run.app/api/auth/login');
-
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': basicAuth,
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'username': email, 'password': password}),
-      );
+      final data = await _authService.login(email, password);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        // Access token available as data['access_token']
-        // Navigate to MainPage
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainPage()),
-        );
-      } else if (response.statusCode == 401) {
-        _showError('Invalid email or password.');
-      } else {
-        _showError('Login failed. Please try again later.');
-      }
+      // Access token is in data['access_token'] if you need it
+      // Navigate to MainPage after successful login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
     } catch (e) {
-      _showError('An error occurred: $e');
+      _showError(e.toString());
     } finally {
       setState(() => isLoading = false);
     }
@@ -59,7 +73,11 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red, // Make the SnackBar red
+        behavior: SnackBarBehavior.floating, // Optional: makes it float above the UI
+      ),
     );
   }
 
@@ -98,10 +116,12 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                         ? null
                         : () {
                       if (_formKey.currentState!.validate()) {
-                        if (!register) {
-                          _login(emailController.text, passwordController.text);
+                        if (register) {
+                          _register(emailController.text, passwordController.text, passwordConfirmationController.text);
+
                         } else {
-                          print('Register user flow');
+
+                          _login(emailController.text, passwordController.text);
                         }
                       }
                     },

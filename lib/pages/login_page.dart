@@ -15,8 +15,8 @@ class AuthenticationScreen extends StatefulWidget {
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final emailController = TextEditingController(text: 'teste3@test.com');
+  final passwordController = TextEditingController(text: 'hahahNaoFalo123@');
   final passwordConfirmationController = TextEditingController();
   final AuthService _authService = AuthService();
   bool register = false;

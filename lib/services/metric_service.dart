@@ -32,7 +32,7 @@ class TrainingMetricService {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': '$token',
         'Content-Type': 'application/json',
       },
       body: jsonEncode(body),

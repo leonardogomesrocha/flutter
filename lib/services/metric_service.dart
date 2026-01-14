@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_app/configure_global.dart';
+import 'package:flutter_app/services/auth_session.dart';
 
 class TrainingMetricService {
+
   /// Creates a new Training Metric
   /// Returns the same object sent to the API
   Future<Map<String, dynamic>> createTrainingMetric({
-    required String accessToken,
     required DateTime referenceDate,
     required int effort,
     required int heartBeat,
@@ -25,10 +26,13 @@ class TrainingMetricService {
       'sleepTime': sleepTime,
     };
 
+    final authSession = AuthSession();
+    final token = authSession.authorizationHeader;
+
     final response = await http.post(
       url,
       headers: {
-        'Authorization': 'Bearer $accessToken',
+        'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
       body: jsonEncode(body),

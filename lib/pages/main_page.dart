@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_app/services/metric_service.dart';
 import 'package:flutter_app/services/auth_session.dart';
 import 'package:flutter_app/pages/login_page.dart';
+import '../models/TrainingZone.dart';
+import '../components/TimeZoneComponent.dart';
+import 'package:intl/intl.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -12,6 +14,17 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  final List<TrainingZone> zones = [
+    TrainingZone(value: 1, label: 'Very Little', color: Colors.blue),
+    TrainingZone(value: 2, label: 'Little', color: Colors.green),
+    TrainingZone(value: 3, label: 'Moderate', color: Colors.purple),
+    TrainingZone(value: 4, label: 'Above', color: Colors.yellow),
+    TrainingZone(value: 5, label: 'High', color: Colors.orange),
+    TrainingZone(value: 6, label: 'Maximum', color: Colors.red),
+  ];
+
+  int? selectedZone;
+
   final _formKey = GlobalKey<FormState>();
 
   DateTime referenceDate = DateTime.now();
@@ -19,6 +32,9 @@ class _MainPageState extends State<MainPage> {
   int heartBeat = 60;
   double weight = 70;
   double sleepTime = 8;
+  int cmj = 0;
+  int imtp = 0;
+  int pushUp = 0;
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
@@ -45,6 +61,9 @@ class _MainPageState extends State<MainPage> {
         "heartBeat": heartBeat,
         "weight": weight,
         "sleepTime": sleepTime,
+        "cmj": cmj,
+        "imtp": imtp,
+        "pushUp": pushUp,
       };
 
       debugPrint(payload.toString());
@@ -67,7 +86,7 @@ class _MainPageState extends State<MainPage> {
         // Success message
         snackBarMessenger.showSnackBar(
           const SnackBar(
-            content: Text('Data saved successfully'),
+            content: Text('Metrics saved successfully'),
             backgroundColor: Colors.green,
           ),
         );
@@ -82,7 +101,6 @@ class _MainPageState extends State<MainPage> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -104,27 +122,34 @@ class _MainPageState extends State<MainPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// DATE
-              Text(
-                'Date',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              Text('Date', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               InkWell(
                 onTap: _pickDate,
                 child: InputDecorator(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Colors.blueAccent,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[100],
                   ),
-                  child: Text(
-                    DateFormat('dd/MM/yyyy').format(referenceDate),
-                  ),
+                  child: Text(DateFormat('dd/MM/yyyy').format(referenceDate)),
                 ),
               ),
 
               const SizedBox(height: 20),
 
               /// EFFORT
-              Text('Effort (0–10)'),
+              Text('Borg Scale (0–10)'),
               Slider(
                 value: effort.toDouble(),
                 min: 0,
@@ -140,12 +165,38 @@ class _MainPageState extends State<MainPage> {
 
               const SizedBox(height: 20),
 
+              // Inject your ZoneSelector here
+              ZoneSelector(
+                zones: zones, // your list of TrainingZone
+                selectedZone: selectedZone, // currently selected value
+                onSelected: (value) {
+                  // callback when user taps a zone
+                  setState(() {
+                    selectedZone = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 20),
+
               /// HEART BEAT
               TextFormField(
                 initialValue: heartBeat.toString(),
-                decoration: const InputDecoration(
-                  labelText: 'Heart Rate (30–250 BPM)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: 'Heart Rate (20–250 BPM)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -155,6 +206,7 @@ class _MainPageState extends State<MainPage> {
                   }
                   return null;
                 },
+
                 onSaved: (value) {
                   heartBeat = int.parse(value!);
                 },
@@ -165,9 +217,21 @@ class _MainPageState extends State<MainPage> {
               /// WEIGHT
               TextFormField(
                 initialValue: weight.toString(),
-                decoration: const InputDecoration(
+                decoration:  InputDecoration(
                   labelText: 'Weight (kg – max 300)',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -187,9 +251,21 @@ class _MainPageState extends State<MainPage> {
               /// SLEEP TIME
               TextFormField(
                 initialValue: sleepTime.toString(),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Sleep hours (0–24)',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -201,6 +277,105 @@ class _MainPageState extends State<MainPage> {
                 },
                 onSaved: (value) {
                   sleepTime = double.parse(value!);
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              /// CMJ
+              TextFormField(
+                initialValue: cmj.toString(),
+                decoration:  InputDecoration(
+                  labelText: 'CMJ (0–100)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  final v = int.tryParse(value ?? '');
+                  if (v == null || v < 0 || v > 100)
+                    return 'CMJ must be between 0 and 100';
+                  return null;
+                },
+                onSaved: (value) {
+                  cmj = int.parse(value!);
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              /// IMTP
+              TextFormField(
+                initialValue: imtp.toString(),
+                decoration:  InputDecoration(
+                  labelText: 'IMTP (0–100)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  final v = int.tryParse(value ?? '');
+                  if (v == null || v < 0 || v > 100)
+                    return 'IMTP must be between 0 and 100';
+                  return null;
+                },
+                onSaved: (value) {
+                  imtp = int.parse(value!);
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              /// Push Up
+              TextFormField(
+                initialValue: pushUp.toString(),
+                decoration:  InputDecoration(
+                  labelText: 'Push Up (0–100)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Colors.blueAccent,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  final v = int.tryParse(value ?? '');
+                  if (v == null || v < 0 || v > 100)
+                    return 'Push Up must be between 0 and 100';
+                  return null;
+                },
+                onSaved: (value) {
+                  pushUp = int.parse(value!);
                 },
               ),
 
@@ -245,14 +420,15 @@ class _MainPageState extends State<MainPage> {
               );
               // If user confirmed, logout
               if (shouldLogout ?? false) {
-
                 AuthSession().clear();
 
                 // Navigate to login page and remove all previous routes
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const AuthenticationScreen()),
-                      (route) => false,
+                  MaterialPageRoute(
+                    builder: (context) => const AuthenticationScreen(),
+                  ),
+                  (route) => false,
                 );
               }
             },
@@ -262,4 +438,3 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
-

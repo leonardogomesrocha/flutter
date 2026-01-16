@@ -18,6 +18,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final emailController = TextEditingController(text: 'teste3@test.com');
   final passwordController = TextEditingController(text: 'hahahNaoFalo123@');
   final passwordConfirmationController = TextEditingController();
+
   final AuthService _authService = AuthService();
   bool register = false;
   bool isLoading = false;

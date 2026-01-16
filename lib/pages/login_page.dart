@@ -4,7 +4,7 @@ import 'package:flutter_app/pages/wave.dart';
 import 'package:flutter_app/pages/main_page.dart';
 import '../services/auth_service.dart';
 import '../services/auth_session.dart';
-
+import 'package:flutter/foundation.dart'; // For kDebugMode
 
 class AuthenticationScreen extends StatefulWidget {
   const AuthenticationScreen({super.key});
@@ -15,19 +15,36 @@ class AuthenticationScreen extends StatefulWidget {
 
 class _AuthenticationScreenState extends State<AuthenticationScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey();
-  final emailController = TextEditingController(text: 'teste3@test.com');
-  final passwordController = TextEditingController(text: 'hahahNaoFalo123@');
+
+  final firstNameController = TextEditingController(
+    text: kDebugMode ? 'John' : '',
+  );
+
+  final lastNameController = TextEditingController(
+    text: kDebugMode ? 'Doe' : '',
+  );
+
+  final emailController = TextEditingController(
+    text: kDebugMode ? 'teste3@test.com' : '',
+  );
+
+  final passwordController = TextEditingController(
+    text: kDebugMode ? 'hahahNaoFalo123@' : '',
+  );
+
   final passwordConfirmationController = TextEditingController();
 
   final AuthService _authService = AuthService();
   bool register = false;
   bool isLoading = false;
 
-  Future<void> _register(String email, String password, String confirmedPassword) async {
+  Future<void> _register(String email, String password, String confirmedPassword, String firstName, String lastName) async {
     setState(() => isLoading = true);
 
     try {
       final data = await _authService.register(
+        firstName: firstName,
+        lastName: lastName,
         email: email,
         password: password,
         confirmedPassword: confirmedPassword,
@@ -102,6 +119,18 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 50),
+                  if (register)
+                    AuthenticationTextFormField(
+                      icon: Icons.person,
+                      label: 'First Name',
+                      textEditingController: firstNameController,
+                    ),
+                  if (register)
+                    AuthenticationTextFormField(
+                      icon: Icons.person_outline,
+                      label: 'Last Name',
+                      textEditingController: lastNameController,
+                    ),
                   AuthenticationTextFormField(
                     icon: Icons.email,
                     label: 'Email',
@@ -125,10 +154,14 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                         : () {
                       if (_formKey.currentState!.validate()) {
                         if (register) {
-                          _register(emailController.text, passwordController.text, passwordConfirmationController.text);
-
+                          _register(
+                            emailController.text,
+                            passwordController.text,
+                            passwordConfirmationController.text,
+                            firstNameController.text,
+                            lastNameController.text,
+                          );
                         } else {
-
                           _login(emailController.text, passwordController.text);
                         }
                       }
@@ -148,7 +181,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                 ],
               ),
             ),
-          ),
+          )
         ],
       ),
     );

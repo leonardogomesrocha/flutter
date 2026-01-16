@@ -11,8 +11,8 @@ class TrainingMetricService {
     required DateTime referenceDate,
     required int effort,
     required int heartBeat,
-    required int weight,
-    required int sleepTime,
+    required double weight,
+    required double sleepTime,
   }) async {
     final url = Uri.parse(
       '${ConfigureGlobal.apiBaseUrl}/api/TrainingMetric',

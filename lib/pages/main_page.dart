@@ -77,8 +77,8 @@ class _MainPageState extends State<MainPage> {
           referenceDate: referenceDate,
           effort: effort,
           heartBeat: heartBeat,
-          weight: weight.toInt(),
-          sleepTime: sleepTime.toInt(),
+          weight: weight.toDouble(),
+          sleepTime: sleepTime.toDouble(),
         );
 
         debugPrint('Metric saved: $result');

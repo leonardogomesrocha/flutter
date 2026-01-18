@@ -32,7 +32,9 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
     text: kDebugMode ? 'hahahNaoFalo123@' : '',
   );
 
-  final passwordConfirmationController = TextEditingController();
+  final passwordConfirmationController = TextEditingController(
+    text: kDebugMode ? 'hahahNaoFalo123@' : '',
+  );
 
   final AuthService _authService = AuthService();
   bool register = false;

@@ -64,6 +64,7 @@ class _MainPageState extends State<MainPage> {
         "cmj": cmj,
         "imtp": imtp,
         "pushUp": pushUp,
+        "trainingZone": selectedZone
       };
 
       debugPrint(payload.toString());
@@ -79,6 +80,9 @@ class _MainPageState extends State<MainPage> {
           heartBeat: heartBeat,
           weight: weight.toDouble(),
           sleepTime: sleepTime.toDouble(),
+          cmj: cmj,
+          imtp: imtp, pushUp : pushUp,
+            trainingZone: selectedZone
         );
 
         debugPrint('Metric saved: $result');
@@ -166,16 +170,45 @@ class _MainPageState extends State<MainPage> {
               const SizedBox(height: 20),
 
               // Inject your ZoneSelector here
-              ZoneSelector(
-                zones: zones, // your list of TrainingZone
-                selectedZone: selectedZone, // currently selected value
-                onSelected: (value) {
-                  // callback when user taps a zone
-                  setState(() {
-                    selectedZone = value;
-                  });
-                },
-              ),
+            FormField<int>(
+              validator: (value) {
+                if (selectedZone == null) {
+                  return 'Please select a training zone';
+                }
+                return null;
+              },
+              builder: (FormFieldState<int> state) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ZoneSelector(
+                      zones: zones,
+                      selectedZone: selectedZone,
+                      onSelected: (value) {
+                        setState(() {
+                          selectedZone = value;
+                        });
+                        state.didChange(value); // 🔥 important
+                      },
+                    ),
+
+                    // Error message
+                    if (state.hasError)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 12),
+                        child: Text(
+                          state.errorText!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+
 
               const SizedBox(height: 20),
 

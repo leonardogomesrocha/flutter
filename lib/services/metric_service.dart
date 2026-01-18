@@ -13,6 +13,10 @@ class TrainingMetricService {
     required int heartBeat,
     required double weight,
     required double sleepTime,
+    required int cmj,
+    required int imtp,
+    required int pushUp,
+    required int? trainingZone
   }) async {
     final url = Uri.parse(
       '${ConfigureGlobal.apiBaseUrl}/api/TrainingMetric',
@@ -24,6 +28,10 @@ class TrainingMetricService {
       'heartBeat': heartBeat,
       'weight': weight,
       'sleepTime': sleepTime,
+      'cmj': cmj,
+      'imtp': imtp,
+      'pushUp': pushUp,
+      'trainingZone':trainingZone
     };
 
     final authSession = AuthSession();

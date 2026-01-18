@@ -74,8 +74,22 @@ class AuthService {
         'email': email,
       };
     } else if (response.statusCode == 400) {
-      // Bad request (validation error)
-      throw Exception('Registration failed: ${response.body}');
+      // If it's a list of validation errors
+      final decoded = jsonDecode(response.body);
+
+      if (decoded is List) {
+        final List<dynamic> errors = decoded;
+
+        if (errors.isNotEmpty) {
+          final Map<String, dynamic> firstError = errors[0];
+          final String message = firstError['errorMessage'];
+
+          throw Exception(message);
+        }
+      }
+
+      throw Exception(response.body);
+
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized: Invalid credentials for registration.');
     } else {
